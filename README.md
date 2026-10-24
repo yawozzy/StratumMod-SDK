@@ -1,1 +1,1 @@
-# StratumMod-API
+# StratumMod-SDK
