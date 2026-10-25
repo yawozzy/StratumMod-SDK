@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>ExampleMod</AssemblyName>
+    <RootNamespace>ExampleMod</RootNamespace>
+    <!-- Nullable works thanks to NullableAttributes.cs (see the comment there). -->
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <!-- Folder with Stratum.API.dll, and the game references made by tools\Get-GameReferences.ps1. -->
+    <StratumSdk Condition="'$(StratumSdk)' == ''">$(MSBuildThisFileDirectory)..\..</StratumSdk>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Private=false: STRATUM provides these at runtime; never ship them with the mod. -->
+    <Reference Include="Stratum.API"><HintPath>$(StratumSdk)\API\Stratum.API.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(StratumSdk)\refs\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>$(StratumSdk)\refs\Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2Cppmscorlib"><HintPath>$(StratumSdk)\refs\Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
+    <EmbeddedResource Include="Resources\icon.png" LogicalName="ExampleMod.icon.png" />
+  </ItemGroup>
+</Project>

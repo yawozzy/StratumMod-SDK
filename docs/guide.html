@@ -1,0 +1,453 @@
+<title>Руководство Stratum SDK</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: the STRATUM menu's own world — graphite panels, one orange accent; sticky contents rail beside a 70ch reading column. */
+:root {
+  --bg: #0e1215; --panel: #151b1f; --panel-2: #1b2227; --line: #263038; --fg: #e9ecef; --muted: #9aa5ae;
+  --accent: #ff9c51; --accent-ink: #1c1108; --accent-soft: rgba(255,156,81,.12); --code: #0a0d10; --ok: #4bdb4b;
+  --display: "Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Cascadia Mono", monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #f3f5f6; --panel: #ffffff; --panel-2: #eef1f3; --line: #d8dee2; --fg: #141a1e; --muted: #56616a;
+  --accent: #c4601a; --accent-ink: #ffffff; --accent-soft: rgba(196,96,26,.10); --code: #f6f8f9; --ok: #1f8f3a; color-scheme: light } }
+:root[data-theme="light"] {
+  --bg: #f3f5f6; --panel: #ffffff; --panel-2: #eef1f3; --line: #d8dee2; --fg: #141a1e; --muted: #56616a;
+  --accent: #c4601a; --accent-ink: #ffffff; --accent-soft: rgba(196,96,26,.10); --code: #f6f8f9; --ok: #1f8f3a; color-scheme: light }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 400 16px/1.65 var(--body); margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.hero { max-width: 1180px; margin: 0 auto; padding-block: 48px 32px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 40px; align-items: center; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--accent); font: 700 15px/1 var(--display); letter-spacing: .14em; }
+.brand svg { width: 34px; height: 34px; }
+.hero h1 { font: 700 clamp(30px, 4.6vw, 52px)/1.08 var(--display); margin: 22px 0 16px; text-wrap: balance; letter-spacing: -.01em; }
+.hero p { color: var(--muted); font-size: 18px; margin: 0 0 24px; max-width: 34em; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+.chip { font: 500 13px/1 var(--mono); padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--panel); }
+.chip b { color: var(--fg); font-weight: 600; }
+.paths { display: flex; flex-wrap: wrap; gap: 12px; }
+.path { display: inline-flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 11px; font-weight: 600; text-decoration: none; border: 1px solid var(--line); color: var(--fg); background: var(--panel); }
+.path.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.path span { font-weight: 400; opacity: .8; }
+.shot { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 60px -30px rgba(0,0,0,.55); }
+.shot img { display: block; width: 100%; height: auto; }
+
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; padding-block: 8px 80px; border-top: 1px solid var(--line); }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; padding-block: 24px; font-size: 14px; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: 5px 10px; border-left: 2px solid transparent; line-height: 1.35; }
+nav.toc a:hover { color: var(--fg); }
+nav.toc a.active { color: var(--fg); border-left-color: var(--accent); background: var(--accent-soft); }
+nav.toc .nav-part { color: var(--fg); font: 600 11px/1.3 var(--display); letter-spacing: .1em; text-transform: uppercase; margin-top: 18px; }
+nav.toc .nav-part:first-child { margin-top: 0; }
+details.toc-mobile { display: none; }
+
+main { min-width: 0; max-width: 760px; padding-top: 24px; }
+main h2 { font: 700 clamp(22px, 3vw, 30px)/1.2 var(--display); margin: 56px 0 18px; padding-top: 28px; border-top: 1px solid var(--line); text-wrap: balance; scroll-margin-top: 16px; }
+main h2:first-child { margin-top: 8px; border-top: 0; padding-top: 0; }
+main h3 { font: 600 21px/1.3 var(--body); margin: 40px 0 12px; scroll-margin-top: 16px; text-wrap: balance; }
+main h4 { font: 600 17px/1.35 var(--body); margin: 28px 0 8px; color: var(--fg); }
+main p, main li { max-width: 68ch; }
+main ul, main ol { padding-left: 1.3em; }
+main li { margin: 4px 0; }
+main hr { border: 0; height: 0; margin: 0; }
+code { font: 500 .88em var(--mono); background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px; padding: .08em .35em; overflow-wrap: anywhere; }
+.code { margin: 18px 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--code); }
+.code-bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px 6px 14px; border-bottom: 1px solid var(--line); font: 600 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--panel); }
+.copy { font: 500 12px/1 var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 7px; padding: 6px 10px; cursor: pointer; }
+.copy:hover { border-color: var(--accent); }
+.code pre { margin: 0; padding: 14px 16px; overflow-x: auto; }
+.code pre code { background: none; border: 0; padding: 0; font: 400 13.5px/1.6 var(--mono); white-space: pre; overflow-wrap: normal; }
+.tok-k { color: var(--accent); } .tok-s { color: #8fd18f; } .tok-c { color: var(--muted); font-style: italic; } .tok-t { color: #7fc4ff; }
+:root[data-theme="light"] .tok-s { color: #237a2e; } :root[data-theme="light"] .tok-t { color: #1d5fa8; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .tok-s { color: #237a2e; } :root:not([data-theme="dark"]) .tok-t { color: #1d5fa8; } }
+.table { overflow-x: auto; margin: 18px 0; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 12px/1.3 var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--panel); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; }
+td code { white-space: nowrap; }
+figure { margin: 22px 0; }
+figure img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); }
+figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+.note { margin: 18px 0; padding: 12px 16px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; background: var(--accent-soft); }
+.note p { margin: 0; }
+.footer { max-width: 1180px; margin: 0 auto; padding-block: 24px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+@media (max-width: 960px) {
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 28px 24px; }
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  nav.toc { display: none; }
+  details.toc-mobile { display: block; margin: 20px 0 0; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+  details.toc-mobile summary { cursor: pointer; padding: 12px 16px; font-weight: 600; }
+  details.toc-mobile nav { padding: 0 16px 14px; columns: 1; }
+  details.toc-mobile nav a { display: block; padding: 5px 0; color: var(--muted); text-decoration: none; }
+  details.toc-mobile nav .nav-part { color: var(--fg); font: 600 11px/1.3 var(--display); letter-spacing: .1em; text-transform: uppercase; margin-top: 12px; }
+  td:first-child, td code { white-space: normal; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<header class="hero">
+  <div>
+    <div class="brand" aria-label="STRATUM">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16.02 12 5.48 3.13a1 1 0 0 1 0 1.74L13 21.74a2 2 0 0 1-2 0l-8.5-4.87a1 1 0 0 1 0-1.74L7.98 12"/><path d="M13 13.74a2 2 0 0 1-2 0L2.5 8.87a1 1 0 0 1 0-1.74L11 2.26a2 2 0 0 1 2 0l8.5 4.87a1 1 0 0 1 0 1.74Z"/></svg>
+      STRATUM
+    </div>
+    <h1>Моды для CarX Drift Racing Online 2 на C#</h1>
+    <p>Как установить загрузчик STRATUM и как написать свой мод: страница в меню игры, горячие клавиши, обмен сообщениями между игроками и прямой доступ к Unity и классам CarX.</p>
+    <div class="chips">
+      <span class="chip">STRATUM <b>0.12.0</b></span>
+      <span class="chip">Stratum.API <b>1.0.0</b></span>
+      <span class="chip">.NET <b>8</b></span>
+      <span class="chip">Insert — <b>меню</b></span>
+    </div>
+    <div class="paths">
+      <a class="path" href="#часть-1-для-игроков">Я играю <span>установка и меню</span></a>
+      <a class="path primary" href="#3-первый-мод-за-5-минут">Я делаю моды <span>первый мод</span></a>
+    </div>
+  </div>
+  <figure class="shot"><img src="images/04-sdk-elements.png" alt="Страница Example Mod в меню STRATUM: кнопки, переключатель, слайдеры, поле ввода"></figure>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Содержание">
+<a class="nav-part" href="#часть-1-для-игроков">Часть 1. Для игроков</a>
+<a class="nav-item" href="#установка-stratum">Установка STRATUM</a>
+<a class="nav-item" href="#меню-stratum">Меню STRATUM</a>
+<a class="nav-item" href="#установка-модов">Установка модов</a>
+<a class="nav-item" href="#настройки-мода-и-горячие-клавиши">Настройки мода и горячие клавиши</a>
+<a class="nav-item" href="#логи">Логи</a>
+<a class="nav-item" href="#где-лежат-файлы">Где лежат файлы</a>
+<a class="nav-part" href="#часть-2-для-мододелов">Часть 2. Для мододелов</a>
+<a class="nav-item" href="#1-что-нужно-установить">1. Что нужно установить</a>
+<a class="nav-item" href="#2-что-внутри-sdk">2. Что внутри SDK</a>
+<a class="nav-item" href="#3-первый-мод-за-5-минут">3. Первый мод за 5 минут</a>
+<a class="nav-item" href="#4-как-устроен-мод">4. Как устроен мод</a>
+<a class="nav-item" href="#5-страница-мода-в-меню-ui">5. Страница мода в меню (UI)</a>
+<a class="nav-item" href="#6-горячие-клавиши">6. Горячие клавиши</a>
+<a class="nav-item" href="#7-мультиплеер-sync">7. Мультиплеер (Sync)</a>
+<a class="nav-item" href="#8-доступ-к-игре">8. Доступ к игре</a>
+<a class="nav-item" href="#9-сохранение-настроек">9. Сохранение настроек</a>
+<a class="nav-item" href="#10-логотип-мода">10. Логотип мода</a>
+<a class="nav-item" href="#11-упаковка-в-strmod">11. Упаковка в .strmod</a>
+<a class="nav-item" href="#12-отладка-и-частые-ошибки">12. Отладка и частые ошибки</a>
+<a class="nav-item" href="#13-справочник-api">13. Справочник API</a>
+<a class="nav-item" href="#14-для-тех-кто-писал-под-ksl">14. Для тех, кто писал под KSL</a>
+  </nav>
+  <main>
+    <details class="toc-mobile"><summary>Содержание</summary><nav aria-label="Содержание">
+<a class="nav-part" href="#часть-1-для-игроков">Часть 1. Для игроков</a>
+<a class="nav-item" href="#установка-stratum">Установка STRATUM</a>
+<a class="nav-item" href="#меню-stratum">Меню STRATUM</a>
+<a class="nav-item" href="#установка-модов">Установка модов</a>
+<a class="nav-item" href="#настройки-мода-и-горячие-клавиши">Настройки мода и горячие клавиши</a>
+<a class="nav-item" href="#логи">Логи</a>
+<a class="nav-item" href="#где-лежат-файлы">Где лежат файлы</a>
+<a class="nav-part" href="#часть-2-для-мододелов">Часть 2. Для мододелов</a>
+<a class="nav-item" href="#1-что-нужно-установить">1. Что нужно установить</a>
+<a class="nav-item" href="#2-что-внутри-sdk">2. Что внутри SDK</a>
+<a class="nav-item" href="#3-первый-мод-за-5-минут">3. Первый мод за 5 минут</a>
+<a class="nav-item" href="#4-как-устроен-мод">4. Как устроен мод</a>
+<a class="nav-item" href="#5-страница-мода-в-меню-ui">5. Страница мода в меню (UI)</a>
+<a class="nav-item" href="#6-горячие-клавиши">6. Горячие клавиши</a>
+<a class="nav-item" href="#7-мультиплеер-sync">7. Мультиплеер (Sync)</a>
+<a class="nav-item" href="#8-доступ-к-игре">8. Доступ к игре</a>
+<a class="nav-item" href="#9-сохранение-настроек">9. Сохранение настроек</a>
+<a class="nav-item" href="#10-логотип-мода">10. Логотип мода</a>
+<a class="nav-item" href="#11-упаковка-в-strmod">11. Упаковка в .strmod</a>
+<a class="nav-item" href="#12-отладка-и-частые-ошибки">12. Отладка и частые ошибки</a>
+<a class="nav-item" href="#13-справочник-api">13. Справочник API</a>
+<a class="nav-item" href="#14-для-тех-кто-писал-под-ksl">14. Для тех, кто писал под KSL</a>
+    </nav></details>
+<p>STRATUM — загрузчик модов для <strong>CarX Drift Racing Online 2</strong> (Windows x64). Меню открывается прямо в игре клавишей <strong>Insert</strong>. Stratum SDK — набор для создания модов на C#: библиотека <strong>Stratum.API</strong>, упаковщик, шаблон и большой пример.</p>
+<aside class="note"><p>Версии: STRATUM <strong>0.12.0</strong>, Stratum.API <strong>1.0.0</strong>.</p></aside>
+<h2 id="часть-1-для-игроков">Часть 1. Для игроков</h2>
+<h3 id="установка-stratum">Установка STRATUM</h3>
+<ol><li>Закройте игру.</li><li>Скопируйте <strong>winhttp.dll</strong> из архива STRATUM в папку игры — туда, где лежит <code>CarX Drift Racing Online 2.exe</code>. Обычно это <code>C:\Program Files (x86)\Steam\steamapps\common\CarX Drift Racing Online 2</code>. Быстрый путь: Steam → ПКМ по игре → <strong>Управление</strong> → <strong>Просмотреть локальные файлы</strong>.</li><li>Для модов на C# один раз установите бесплатный <strong><a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">Microsoft .NET 8 Runtime (x64)</a></strong> — раздел «.NET Runtime», Windows x64. Без него работают только нативные моды, а у C#-модов в меню будет подсказка.</li><li>Запустите игру через Steam. При первом запуске рядом с игрой появится папка <strong>STRATUM</strong>.</li></ol>
+<aside class="note"><p>Если раньше стоял BepInEx, уберите из папки игры его файлы: <code>doorstop_config.ini</code>, папки <code>BepInEx</code> и <code>dotnet</code> и старый <code>winhttp.dll</code> BepInEx. STRATUM заменяет их полностью, а моды BepInEx 6 IL2CPP запускает сам.</p></aside>
+<h3 id="меню-stratum">Меню STRATUM</h3>
+<p>Нажмите <strong>Insert</strong> в игре. Ещё раз <strong>Insert</strong> — меню закроется.</p>
+<figure><img src="images/01-sdk-list.png" alt="Список модов" loading="lazy"><figcaption>Список модов</figcaption></figure>
+<ul><li><strong>Мои моды</strong> — список установленных модов. Справа — подробности о выбранном моде.</li><li>Переключатель справа в строке мода включает и выключает его.</li><li><strong>Логи</strong> — события загрузчика и модов.</li><li><strong>Настройки</strong> — масштаб интерфейса, язык, анимации, автозапуск новых модов.</li></ul>
+<h3 id="установка-модов">Установка модов</h3>
+<p>Есть два способа.</p>
+<p><strong>Через меню.</strong> Нажмите <strong>«Установить мод»</strong> и выберите:</p>
+<ul><li><strong>«Файл .strmod / .dll»</strong> — один мод;</li><li><strong>«Папка с модами»</strong> — папку мода или целую папку <code>BepInEx</code> от старой установки: её <code>plugins</code> станут модами, а <code>config</code> перенесётся в <code>STRATUM\Configs\Legacy</code>.</li></ul>
+<figure><img src="images/02-import.png" alt="Установка мода" loading="lazy"><figcaption>Установка мода</figcaption></figure>
+<p><strong>Вручную.</strong> Положите файл <code>.strmod</code> или <code>.dll</code> (или папку мода) в <code>STRATUM\Mods</code> при закрытой игре.</p>
+<p>Какие моды поддерживаются:</p>
+<div class="table"><table><thead><tr><th>Тип</th><th>Пример</th><th>Нужно</th></tr></thead><tbody><tr><td>Моды Stratum SDK (<code>.strmod</code> или <code>.dll</code>)</td><td>Example Mod</td><td>.NET 8</td></tr><tr><td>Моды BepInEx 6 IL2CPP</td><td>NeXT, XMetrics, KEF TV</td><td>.NET 8</td></tr><tr><td>Нативные моды (C++ / C# Native AOT)</td><td>HelloNative</td><td>—</td></tr></tbody></table></div>
+<p>Моды для BepInEx 5 / Mono не поддерживаются: в CarX DRO2 нет Mono.</p>
+<aside class="note"><p>Включение и выключение C#-мода применяется <strong>после перезапуска игры</strong>. Уже загруженный C#-код выгрузить нельзя — меню об этом напомнит.</p></aside>
+<h3 id="настройки-мода-и-горячие-клавиши">Настройки мода и горячие клавиши</h3>
+<p>Выберите мод и нажмите <strong>«Настройки мода»</strong>. Здесь мод показывает свою страницу. Внизу — его горячие клавиши: нажмите на комбинацию и затем новые клавиши. <strong>Esc</strong> — отмена, <strong>Backspace</strong> — убрать клавишу, кнопка со стрелкой — вернуть по умолчанию.</p>
+<figure><img src="images/06-sdk-hotkeys.png" alt="Горячие клавиши" loading="lazy"><figcaption>Горячие клавиши</figcaption></figure>
+<p>Горячие клавиши не срабатывают, пока открыто меню STRATUM или окно игры не активно.</p>
+<h3 id="логи">Логи</h3>
+<p>Раздел <strong>Логи</strong> показывает, что происходит. Фильтр «Все источники» выбирает конкретный мод, кнопки справа оставляют только предупреждения или ошибки. «Сохранить логи» копирует их в файл — пригодится, чтобы отправить автору мода.</p>
+<figure><img src="images/08-logs.png" alt="Логи" loading="lazy"><figcaption>На снимке — пример записей Example Mod.</figcaption></figure>
+<h3 id="где-лежат-файлы">Где лежат файлы</h3>
+<div class="code"><div class="code-bar"><span></span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-text">&lt;папка игры&gt;\
+├── winhttp.dll              ← STRATUM
+└── STRATUM\
+    ├── Mods\                ← моды
+    ├── Configs\             ← настройки STRATUM и модов
+    │   ├── &lt;id мода&gt;\       ← папка настроек мода Stratum SDK
+    │   └── Legacy\          ← конфиги модов BepInEx
+    └── Logs\                ← loader.log, mods.log, compatibility.log</code></pre></div>
+<hr>
+<h2 id="часть-2-для-мододелов">Часть 2. Для мододелов</h2>
+<p>Stratum.API устроен похоже на KSL SDK: вы пишете обычную C#-библиотеку, наследуете класс мода и получаете готовые сервисы — <strong>лог, страницу в меню, горячие клавиши и обмен сообщениями между игроками</strong>. К самой игре (Unity и классам CarX) есть прямой доступ, как в модах BepInEx IL2CPP.</p>
+<h3 id="1-что-нужно-установить">1. Что нужно установить</h3>
+<ul><li><strong><a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">.NET 8 SDK</a></strong> (или новее) — для сборки.</li><li>Редактор: <strong>Visual Studio 2022</strong>, <strong>JetBrains Rider</strong> или <strong>VS Code</strong> с расширением C# Dev Kit.</li><li>Установленная игра со <strong>STRATUM 0.12+</strong> — из неё берутся ссылки на классы игры.</li></ul>
+<h3 id="2-что-внутри-sdk">2. Что внутри SDK</h3>
+<div class="code"><div class="code-bar"><span></span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-text">STRATUM-SDK-1.0.0\
+├── API\
+│   ├── Stratum.API.dll          ← библиотека, на которую ссылается мод
+│   └── Stratum.API.xml          ← подсказки к API для IDE
+├── tools\
+│   ├── Get-GameReferences.ps1   ← достаёт ссылки на классы игры из STRATUM
+│   ├── Build-Mod.ps1            ← собирает мод и упаковывает в .strmod
+│   └── stratum-pack.exe         ← упаковщик .strmod
+├── template\MyMod\              ← минимальный проект — начинайте с него
+├── examples\
+│   ├── ExampleMod\              ← большой пример всех возможностей
+│   └── prebuilt\ExampleMod-1.0.0.strmod
+├── refs\                        ← сюда Get-GameReferences.ps1 кладёт ссылки на игру
+└── docs\                        ← это руководство</code></pre></div>
+<h3 id="3-первый-мод-за-5-минут">3. Первый мод за 5 минут</h3>
+<p><strong>Шаг 1. Ссылки на игру.</strong> Откройте PowerShell в папке SDK и выполните (путь — ваша папка игры):</p>
+<div class="code"><div class="code-bar"><span>PowerShell</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-powershell">.\tools\Get-GameReferences.ps1 -Game &quot;C:\Program Files (x86)\Steam\steamapps\common\CarX Drift Racing Online 2&quot;</code></pre></div>
+<p>В папке <code>refs</code> появятся ~285 сборок: Unity, CarX, Il2CppInterop, HarmonyX. Повторите после обновления игры или STRATUM.</p>
+<aside class="note"><p>Если PowerShell пишет, что выполнение скриптов запрещено, запустите один раз: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>.</p></aside>
+<p><strong>Шаг 2. Копия шаблона.</strong> Скопируйте <code>template\MyMod</code> рядом, например в <code>template\DriftTimer</code>. Переименуйте <code>MyMod.csproj</code> и поменяйте в нём <code>AssemblyName</code>.</p>
+<p><strong>Шаг 3. Описание мода.</strong> В <code>MyMod.cs</code> поменяйте атрибут, а в <code>manifest.ini</code> — те же поля:</p>
+<div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">[StratumMod(&quot;myname.drifttimer&quot;, &quot;Drift Timer&quot;, &quot;1.0.0&quot;, Author = &quot;MyName&quot;, Description = &quot;Таймер дрифта&quot;)]
+public sealed class DriftTimer : StratumMod
+{
+    public override void OnLoad() =&gt; Log.Info(&quot;Drift Timer loaded&quot;);
+}</code></pre></div>
+<div class="code"><div class="code-bar"><span>manifest.ini</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-ini">id=myname.drifttimer
+name=Drift Timer
+version=1.0.0
+author=MyName
+description=Таймер дрифта</code></pre></div>
+<p>Правила для <code>id</code>: только строчные латинские буквы, цифры, <code>.</code>, <code>_</code>, <code>-</code>. Удобно так: <code>ник.мод</code>. <strong>Не меняйте id после выпуска</strong> — по нему сохраняются настройки и работает Sync.</p>
+<p><strong>Шаг 4. Сборка.</strong></p>
+<div class="code"><div class="code-bar"><span>PowerShell</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-powershell">.\tools\Build-Mod.ps1 -Project .\template\DriftTimer</code></pre></div>
+<p>Готовый файл — <code>template\DriftTimer\dist\DriftTimer-1.0.0.strmod</code>.</p>
+<p><strong>Шаг 5. Установка.</strong> Закройте игру, положите <code>.strmod</code> в <code>STRATUM\Mods</code> (или установите через меню), запустите игру. В разделе <strong>Логи</strong> появится «Drift Timer loaded».</p>
+<aside class="note"><p>Можно ставить и просто <code>.dll</code> из <code>bin\Release\net8.0</code> — для быстрой проверки. Для публикации используйте <code>.strmod</code>: в нём есть название, автор, описание и логотип, а файл защищён контрольной суммой.</p></aside>
+<h3 id="4-как-устроен-мод">4. Как устроен мод</h3>
+<p>Мод — это класс, унаследованный от <code>StratumMod</code> и помеченный <code>[StratumMod]</code>. STRATUM создаёт один его экземпляр и вызывает методы:</p>
+<div class="table"><table><thead><tr><th>Метод</th><th>Когда вызывается</th></tr></thead><tbody><tr><td><code>OnLoad()</code></td><td>один раз, когда игра запущена</td></tr><tr><td><code>OnUpdate(float deltaTime)</code></td><td>каждый кадр</td></tr><tr><td><code>OnDrawUI()</code></td><td>пока у игрока открыта страница мода в меню (около 30 раз в секунду)</td></tr><tr><td><code>OnQuit()</code></td><td>при закрытии игры — сохраните несохранённое</td></tr><tr><td><code>GetIcon()</code></td><td>один раз при загрузке — PNG-логотип или <code>null</code></td></tr></tbody></table></div>
+<p><strong>Все методы выполняются в главном потоке Unity.</strong> Поэтому из любого из них можно спокойно работать с объектами игры — в том числе из кода страницы в меню.</p>
+<p>Что доступно внутри класса мода:</p>
+<div class="table"><table><thead><tr><th>Свойство</th><th>Что это</th></tr></thead><tbody><tr><td><code>Log</code></td><td>запись в лог STRATUM (<code>Info</code>, <code>Warning</code>, <code>Error</code>)</td></tr><tr><td><code>UI</code></td><td>элементы страницы мода</td></tr><tr><td><code>Input</code></td><td>горячие клавиши</td></tr><tr><td><code>Sync</code></td><td>сообщения между игроками</td></tr><tr><td><code>ConfigDirectory</code></td><td>личная папка мода <code>STRATUM\Configs\&lt;id&gt;</code></td></tr><tr><td><code>Id</code>, <code>Name</code>, <code>Version</code></td><td>данные из атрибута</td></tr></tbody></table></div>
+<p>Если <code>OnLoad</code> или <code>OnUpdate</code> выбросит исключение, STRATUM остановит мод, запишет ошибку в лог и покажет её в меню — игра продолжит работать.</p>
+<h3 id="5-страница-мода-в-меню-ui">5. Страница мода в меню (UI)</h3>
+<p>UI работает в стиле <strong>immediate mode</strong>, как в KSL: каждый раз в <code>OnDrawUI</code> вы заново описываете страницу, а интерактивные элементы возвращают <code>true</code>, когда игрок ими воспользовался.</p>
+<div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">bool enabled = true;
+float power = 0.5f;
+
+public override void OnDrawUI()
+{
+    UI.Header(&quot;Настройки&quot;);
+    if (UI.Toggle(&quot;Включить&quot;, ref enabled)) Log.Info(&quot;Включено: &quot; + enabled);
+    UI.Slider(&quot;Сила&quot;, ref power, 0, 1, step: 0.05f);
+    if (UI.Button(&quot;Сбросить&quot;, primary: true)) power = 0.5f;
+}</code></pre></div>
+<p>Меню рисует элементы в своём стиле — моду не нужно ничего настраивать.</p>
+<figure><img src="images/03-sdk-main.png" alt="Главная страница примера" loading="lazy"><figcaption>Главная страница примера</figcaption></figure>
+<h4 id="все-элементы">Все элементы</h4>
+<div class="table"><table><thead><tr><th>Метод</th><th>Что делает</th></tr></thead><tbody><tr><td><code>Label(text)</code></td><td>обычный текст с переносом</td></tr><tr><td><code>Header(text)</code></td><td>жирный заголовок раздела</td></tr><tr><td><code>Hint(text)</code></td><td>серый поясняющий текст</td></tr><tr><td><code>Separator()</code></td><td>тонкая линия</td></tr><tr><td><code>Space(height)</code></td><td>пустой отступ</td></tr><tr><td><code>Button(label, tooltip, primary)</code></td><td>кнопка → <code>true</code> после нажатия; <code>primary: true</code> — оранжевая</td></tr><tr><td><code>Toggle(label, ref bool, tooltip)</code></td><td>переключатель → <code>true</code>, если изменился</td></tr><tr><td><code>Slider(label, ref float, min, max, step)</code></td><td>ползунок для дробных</td></tr><tr><td><code>Slider(label, ref int, min, max)</code></td><td>ползунок для целых</td></tr><tr><td><code>Input(label, ref string, maxLength, hint)</code></td><td>поле ввода</td></tr><tr><td><code>Dropdown(label, ref int index, options)</code></td><td>выпадающий список</td></tr><tr><td><code>Progress(label, fraction)</code></td><td>полоса прогресса (0…1)</td></tr><tr><td><code>Link(text, url)</code></td><td>ссылка, открывается в браузере (только http/https)</td></tr><tr><td><code>PageButton(label, draw, title)</code></td><td>кнопка, открывающая вложенную страницу</td></tr><tr><td><code>Back()</code></td><td>вернуться на предыдущую страницу</td></tr><tr><td><code>using (UI.Row())</code></td><td>элементы внутри — в одну строку</td></tr><tr><td><code>using (UI.Group(&quot;Заголовок&quot;))</code></td><td>элементы внутри — в карточке</td></tr></tbody></table></div>
+<figure><img src="images/04-sdk-elements.png" alt="Элементы UI" loading="lazy"><figcaption>Элементы UI</figcaption></figure>
+<h4 id="строки-карточки-и-вложенные-страницы">Строки, карточки и вложенные страницы</h4>
+<div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">using (UI.Group(&quot;Камера&quot;))
+{
+    using (UI.Row())
+    {
+        if (UI.Button(&quot;Ближе&quot;)) distance -= 1;
+        if (UI.Button(&quot;Дальше&quot;)) distance += 1;
+    }
+}
+
+UI.PageButton(&quot;Дополнительно&quot;, DrawAdvanced, &quot;Дополнительные настройки&quot;);
+
+void DrawAdvanced()
+{
+    UI.Label(&quot;Вложенная страница. Кнопка «Назад» появляется сама.&quot;);
+}</code></pre></div>
+<figure><img src="images/05-sdk-layout.png" alt="Раскладка" loading="lazy"><figcaption>Раскладка</figcaption></figure>
+<h4 id="важно-знать">Важно знать</h4>
+<ul><li><strong>Подписи — это id элементов.</strong> Если на странице две кнопки «Удалить», они различаются по порядку. Чтобы id не зависел от порядка, добавьте скрытый суффикс: <code>UI.Button(&quot;Удалить##slot2&quot;)</code> — после <code>##</code> текст не показывается.</li><li><strong>Значения храните в полях класса.</strong> Метод <code>Toggle(ref value)</code> меняет вашу переменную, поэтому её нужно держать между кадрами.</li><li><strong>Задержка — один кадр.</strong> Нажатие приходит моду в следующем вызове <code>OnDrawUI</code>. Это незаметно для игрока.</li><li><strong>Код страницы работает только пока она открыта.</strong> Логику, которая должна работать всегда, держите в <code>OnUpdate</code>.</li></ul>
+<h3 id="6-горячие-клавиши">6. Горячие клавиши</h3>
+<p>Зарегистрируйте клавиши в <code>OnLoad</code>. Игрок увидит их на странице мода и сможет переназначить — выбор сохраняется сам (<code>STRATUM\Configs\&lt;id&gt;\hotkeys.cfg</code>).</p>
+<div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">public override void OnLoad()
+{
+    // Нажатие: один раз. По умолчанию Ctrl + H.
+    Input.Bind(&quot;hello&quot;, &quot;Поздороваться&quot;, () =&gt; Log.Info(&quot;Привет!&quot;), Key.LeftCtrl, Key.H);
+
+    // Удержание: каждый кадр, пока клавиша зажата.
+    Input.Bind(&quot;boost&quot;, &quot;Ускорение&quot;, () =&gt; Boost(), HotkeyMode.Hold, Key.LeftShift, Key.B);
+
+    // Отпускание: один раз, когда клавиши отпущены.
+    Input.Bind(&quot;photo&quot;, &quot;Скриншот&quot;, () =&gt; TakePhoto(), HotkeyMode.Release, Key.F9);
+}
+
+public override void OnDrawUI()
+{
+    UI.Hint(&quot;Ускорение: &quot; + Input.Describe(&quot;boost&quot;));   // &quot;Shift + B&quot; или то, что выбрал игрок
+}</code></pre></div>
+<ul><li><code>id</code> хоткея — латиница, цифры, <code>.</code>, <code>_</code>, <code>-</code>. По нему сохраняется выбор игрока.</li><li>Комбинация — до трёх модификаторов (Ctrl, Shift, Alt) и одна клавиша. Сравнение точное: хоткей <code>H</code> не сработает на <code>Ctrl + H</code>.</li><li><code>Input.IsHeld(&quot;id&quot;)</code> — зажата ли комбинация сейчас.</li><li>Хоткеи не срабатывают, пока открыто меню STRATUM и когда игра не в фокусе.</li></ul>
+<h3 id="7-мультиплеер-sync">7. Мультиплеер (Sync)</h3>
+<p><code>Sync</code> передаёт сообщения игрокам <strong>в той же онлайн-комнате, у которых установлен этот же мод</strong>. Остальные ничего не получают и не видят.</p>
+<div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">public override void OnLoad()
+{
+    // Текст
+    Sync.On(&quot;chat&quot;, m =&gt; Log.Info(m.Sender.Name + &quot;: &quot; + m.Text));
+
+    // Упакованные значения: читать в том же порядке, что и писали
+    Sync.On(&quot;score&quot;, m =&gt;
+    {
+        var r = m.Read();
+        int points = r.ReadInt();
+        float angle = r.ReadFloat();
+        Log.Info($&quot;{m.Sender.Name}: {points} очков, угол {angle:0}°&quot;);
+    });
+
+    Sync.PlayerJoined += p =&gt; Log.Info(p.Name + &quot; тоже с модом&quot;);
+    Sync.PlayerLeft += p =&gt; Log.Info(p.Name + &quot; ушёл&quot;);
+}
+
+void SendScore(int points, float angle)
+{
+    if (Sync.IsAvailable)
+        Sync.Send(&quot;score&quot;, new SyncWriter().Write(points).Write(angle));
+}</code></pre></div>
+<figure><img src="images/07-sdk-sync.png" alt="Sync в примере" loading="lazy"><figcaption>Sync в примере</figcaption></figure>
+<p><strong>Как это работает.</strong> Сообщения идут через сервер игры (SmartFox) — тем же каналом, которым CarX передаёт состояние игроков. Отдельный сервер не нужен.</p>
+<p><strong>Ограничения — прочитайте обязательно:</strong></p>
+<div class="table"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Задержка</td><td>обычно 0,5–5 секунд</td></tr><tr><td>Частота</td><td>сообщения копятся и отправляются пачкой раз в 0,5 с</td></tr><tr><td>Размер</td><td>сообщение ≤ 512 байт, пачка за 0,5 с ≤ 1536 байт (<code>Send</code> вернёт <code>false</code>, если больше)</td></tr><tr><td>Надёжность</td><td>если игрок пропустил пачку (например, только что зашёл), она потеряна</td></tr><tr><td>Подходит</td><td>события, общее состояние, готовность, счёт, настройки</td></tr><tr><td>Не подходит</td><td>данные каждого кадра, позиции в реальном времени</td></tr></tbody></table></div>
+<p>Важное состояние периодически отправляйте заново или по событию <code>PlayerJoined</code>. <code>Sync.Players</code> — список игроков с модом, <code>Sync.IsPrivateRoom</code> — зашли ли вы в комнату с паролем.</p>
+<aside class="note"><p>Пользуйтесь Sync ответственно: не отправляйте лишнего и не используйте его, чтобы мешать другим игрокам. Правила CarX действуют и для модов.</p></aside>
+<h3 id="8-доступ-к-игре">8. Доступ к игре</h3>
+<p>Классы игры подключаются как обычные ссылки из папки <code>refs</code>. Шаблон уже подключает <code>UnityEngine.CoreModule</code>, <code>Il2CppInterop.Runtime</code> и <code>Il2Cppmscorlib</code>; другие сборки добавляйте так же:</p>
+<div class="code"><div class="code-bar"><span>MSBuild</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-xml">&lt;Reference Include=&quot;CarX.DR3.Assembly&quot;&gt;
+  &lt;HintPath&gt;$(StratumSdk)\refs\CarX.DR3.Assembly.dll&lt;/HintPath&gt;
+  &lt;Private&gt;false&lt;/Private&gt;
+&lt;/Reference&gt;</code></pre></div>
+<p><code>Private=false</code> обязателен: STRATUM сам предоставляет эти сборки, класть их в мод нельзя.</p>
+<div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">using UnityEngine;
+using UnityEngine.SceneManagement;
+
+var scene = SceneManager.GetActiveScene().name;
+var camera = Camera.main;
+if (camera != null) camera.fieldOfView = 80;</code></pre></div>
+<p>Работа с классами игры устроена так же, как в модах BepInEx IL2CPP (Il2CppInterop): <code>TryCast&lt;T&gt;()</code>, коллекции <code>Il2CppSystem.*</code> и т. д. Библиотека HarmonyX (<code>0Harmony.dll</code> в <code>refs</code>) тоже доступна.</p>
+<aside class="note"><p><strong>Ошибка CS0656 (NullableAttribute).</strong> Сборка игры <code>UnityEngine.CoreModule</code> объявляет свои <code>NullableAttribute</code>, из-за чего C# ломается. Решение уже в шаблоне: файл <code>NullableAttributes.cs</code>. Не удаляйте его.</p></aside>
+<h3 id="9-сохранение-настроек">9. Сохранение настроек</h3>
+<p>У каждого мода есть своя папка — <code>ConfigDirectory</code> (<code>STRATUM\Configs\&lt;id&gt;</code>). Храните там что угодно, например JSON:</p>
+<div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">using System.Text.Json;
+
+class Settings { public bool Enabled = true; public float Power = 0.5f; }
+
+Settings settings = new();
+string SettingsPath =&gt; Path.Combine(ConfigDirectory, &quot;settings.json&quot;);
+static readonly JsonSerializerOptions Json = new() { IncludeFields = true, WriteIndented = true };
+
+public override void OnLoad()
+{
+    if (File.Exists(SettingsPath))
+        settings = JsonSerializer.Deserialize&lt;Settings&gt;(File.ReadAllText(SettingsPath), Json) ?? new();
+}
+
+void Save() =&gt; File.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings, Json));
+
+public override void OnDrawUI()
+{
+    if (UI.Toggle(&quot;Включить&quot;, ref settings.Enabled)) Save();
+}</code></pre></div>
+<p>Полный вариант — <code>examples\ExampleMod\Settings.cs</code>.</p>
+<h3 id="10-логотип-мода">10. Логотип мода</h3>
+<ul><li>В <strong>.strmod</strong>: положите <code>icon.png</code> рядом с проектом — <code>Build-Mod.ps1</code> упакует его сам. Квадратная PNG, лучше 256×256 или 512×512.</li><li>В <strong>.dll</strong>: добавьте PNG как ресурс и верните его из <code>GetIcon()</code>:</li></ul>
+<div class="code"><div class="code-bar"><span>MSBuild</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-xml">&lt;EmbeddedResource Include=&quot;icon.png&quot; LogicalName=&quot;MyMod.icon.png&quot; /&gt;</code></pre></div>
+<div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">public override byte[]? GetIcon() =&gt; LoadEmbeddedResource(&quot;MyMod.icon.png&quot;);</code></pre></div>
+<p>Без логотипа меню показывает первые буквы названия.</p>
+<h3 id="11-упаковка-в-strmod">11. Упаковка в .strmod</h3>
+<p><code>.strmod</code> — один файл: DLL мода + <code>manifest.ini</code> + логотип + контрольная сумма.</p>
+<p><code>manifest.ini</code>:</p>
+<div class="table"><table><thead><tr><th>Поле</th><th>Обязательно</th><th>Пример</th></tr></thead><tbody><tr><td><code>id</code></td><td>да</td><td><code>myname.drifttimer</code> — должен совпадать с id в <code>[StratumMod]</code></td></tr><tr><td><code>name</code></td><td>да</td><td><code>Drift Timer</code></td></tr><tr><td><code>version</code></td><td>да</td><td><code>1.2.0</code> (major.minor.patch)</td></tr><tr><td><code>author</code></td><td>нет</td><td><code>MyName</code></td></tr><tr><td><code>description</code></td><td>нет</td><td>одна строка</td></tr></tbody></table></div>
+<p>Вручную (то же, что делает <code>Build-Mod.ps1</code>):</p>
+<div class="code"><div class="code-bar"><span>PowerShell</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-powershell">.\tools\stratum-pack.exe pack bin\Release\net8.0\DriftTimer.dll manifest.ini icon.png DriftTimer-1.0.0.strmod
+.\tools\stratum-pack.exe inspect DriftTimer-1.0.0.strmod</code></pre></div>
+<p><code>inspect</code> покажет данные пакета и <code>abi=2 (C# Stratum.API)</code>. Упаковщик сам определяет тип DLL, так что нативные моды (C++ / Native AOT) он пакует тоже.</p>
+<h3 id="12-отладка-и-частые-ошибки">12. Отладка и частые ошибки</h3>
+<p>Смотрите <strong>Логи</strong> в меню (фильтр по вашему моду) или файлы в <code>STRATUM\Logs</code>:</p>
+<ul><li><code>mods.log</code> — сообщения модов (<code>Log.Info</code> и т. п.) и статусы загрузки;</li><li><code>compatibility.log</code> — подробности слоя C# (исключения, BepInEx-моды);</li><li><code>loader.log</code> — запуск STRATUM.</li></ul>
+<div class="table"><table><thead><tr><th>Проблема</th><th>Причина и решение</th></tr></thead><tbody><tr><td><code>error CS0656 ... NullableAttribute</code></td><td>нет <code>NullableAttributes.cs</code> в проекте — скопируйте его из шаблона</td></tr><tr><td>Не находятся <code>UnityEngine</code>, <code>Camera</code> и т. п.</td><td>не выполнен <code>Get-GameReferences.ps1</code> или не добавлена ссылка в <code>.csproj</code></td></tr><tr><td>В меню «Для C#-модов установите .NET 8»</td><td>у игрока нет .NET 8 Runtime x64</td></tr><tr><td>«Недопустимый id мода»</td><td>id содержит заглавные буквы, пробелы или кириллицу</td></tr><tr><td>«В сборке нет класса, унаследованного от StratumMod»</td><td>класс мода абстрактный, не наследует <code>StratumMod</code> или его нет</td></tr><tr><td>«Класс … без атрибута [StratumMod]»</td><td>добавьте атрибут</td></tr><tr><td>«Мод с id … уже загружен»</td><td>установлены две копии мода</td></tr><tr><td>Мод остановлен с ошибкой <code>OnUpdate</code></td><td>исключение в <code>OnUpdate</code>: смотрите стек в логе</td></tr><tr><td>Изменения не применяются</td><td>C#-мод обновляется только после перезапуска игры</td></tr><tr><td>Хоткей не срабатывает</td><td>открыто меню STRATUM, игра не в фокусе или зажат лишний модификатор (сравнение точное)</td></tr><tr><td><code>Sync.Send</code> возвращает <code>false</code></td><td>вы не в онлайн-комнате, сообщение больше 512 байт или пачка за 0,5 с уже заполнена</td></tr></tbody></table></div>
+<h3 id="13-справочник-api">13. Справочник API</h3>
+<p>Полные описания есть в подсказках IDE (<code>Stratum.API.xml</code>). Кратко:</p>
+<p><strong><code>StratumModAttribute(id, name, version)</code></strong> — <code>Author</code>, <code>Description</code>.</p>
+<p><strong><code>StratumMod</code></strong> — <code>OnLoad()</code>, <code>OnUpdate(float)</code>, <code>OnDrawUI()</code>, <code>OnQuit()</code>, <code>GetIcon()</code>; свойства <code>Log</code>, <code>UI</code>, <code>Input</code>, <code>Sync</code>, <code>ConfigDirectory</code>, <code>Id</code>, <code>Name</code>, <code>Version</code>; помощник <code>LoadEmbeddedResource(name)</code>.</p>
+<p><strong><code>ModLog</code></strong> — <code>Info(text)</code>, <code>Warning(text)</code>, <code>Error(text)</code>, <code>Error(text, exception)</code>.</p>
+<p><strong><code>ModUI</code></strong> — <code>Label</code>, <code>Header</code>, <code>Hint</code>, <code>Separator</code>, <code>Space</code>, <code>Button</code>, <code>Toggle</code>, <code>Slider</code> (float/int), <code>Input</code>, <code>Dropdown</code>, <code>Progress</code>, <code>Link</code>, <code>PageButton</code>, <code>Back</code>, <code>Row()</code>, <code>Group(title)</code>, свойство <code>IsOpen</code>.</p>
+<p><strong><code>ModInput</code></strong> — <code>Bind(id, label, callback, mode, keys…)</code>, <code>Bind(id, label, callback, keys…)</code>, <code>IsHeld(id)</code>, <code>Describe(id)</code>. Перечисления <code>Key</code> (A–Z, D0–D9, F1–F12, стрелки, Numpad, модификаторы и т. д.) и <code>HotkeyMode</code> (<code>Press</code>, <code>Hold</code>, <code>Release</code>).</p>
+<p><strong><code>ModSync</code></strong> — <code>IsAvailable</code>, <code>IsPrivateRoom</code>, <code>LocalPlayer</code>, <code>Players</code>, события <code>PlayerJoined</code>/<code>PlayerLeft</code>, <code>On(channel, handler)</code>, <code>Send(channel, byte[] | string | SyncWriter)</code>, константы <code>MaxMessageBytes = 512</code>, <code>MaxWindowBytes = 1536</code>.</p>
+<p><strong><code>SyncMessage</code></strong> — <code>Channel</code>, <code>Sender</code>, <code>Data</code>, <code>Text</code>, <code>Read()</code>. <strong><code>SyncPlayer</code></strong> — <code>Id</code>, <code>Name</code>, <code>IsLocal</code>.</p>
+<p><strong><code>SyncWriter</code></strong> — <code>Write(bool | byte | int | long | float | double | string)</code>, <code>Write(x, y, z)</code>, <code>Length</code>, <code>ToArray()</code>. <strong><code>SyncReader</code></strong> — <code>ReadBool</code>, <code>ReadByte</code>, <code>ReadInt</code>, <code>ReadLong</code>, <code>ReadFloat</code>, <code>ReadDouble</code>, <code>ReadString</code>, <code>ReadVector</code>, <code>End</code>.</p>
+<h3 id="14-для-тех-кто-писал-под-ksl">14. Для тех, кто писал под KSL</h3>
+<div class="table"><table><thead><tr><th>KSL</th><th>Stratum.API</th></tr></thead><tbody><tr><td><code>[KSLMeta(&quot;Name&quot;, &quot;1.0.0&quot;, &quot;author&quot;)]</code></td><td><code>[StratumMod(&quot;author.name&quot;, &quot;Name&quot;, &quot;1.0.0&quot;, Author = &quot;author&quot;)]</code></td></tr><tr><td><code>BaseMod</code></td><td><code>StratumMod</code></td></tr><tr><td><code>Start()</code></td><td><code>OnLoad()</code></td></tr><tr><td><code>Update()</code></td><td><code>OnUpdate(float deltaTime)</code></td></tr><tr><td><code>OnUIDraw()</code></td><td><code>OnDrawUI()</code></td></tr><tr><td><code>GetIcon()</code> → <code>Texture2D</code></td><td><code>GetIcon()</code> → PNG <code>byte[]</code></td></tr><tr><td><code>Kino.Log.Info</code></td><td><code>Log.Info</code></td></tr><tr><td><code>Kino.UI.Button / Toggle / Slider</code></td><td><code>UI.Button / Toggle / Slider</code></td></tr><tr><td><code>Kino.UI.ContextButton</code> + <code>PushContext</code></td><td><code>UI.PageButton(label, draw, title)</code></td></tr><tr><td><code>Kino.UI.PopContext</code></td><td><code>UI.Back()</code></td></tr><tr><td><code>Kino.UI.BeginHorizontal / EndHorizontal</code></td><td><code>using (UI.Row())</code></td></tr><tr><td><code>Kino.UI.GroupLabel</code></td><td><code>UI.Header</code> / <code>using (UI.Group(...))</code></td></tr><tr><td><code>Kino.UI.Hyperlink</code></td><td><code>UI.Link</code></td></tr><tr><td><code>Kino.Input.Bind(keys, action, name, ActionType)</code></td><td><code>Input.Bind(id, label, action, HotkeyMode, keys…)</code></td></tr><tr><td><code>Kino.Sync.TryRegisterPacket</code> + <code>SetCallback</code></td><td><code>Sync.On(channel, handler)</code></td></tr><tr><td><code>Kino.Sync.CreatePacket</code> + <code>SendToAll</code></td><td><code>Sync.Send(channel, new SyncWriter()...)</code></td></tr><tr><td><code>Kino.Prefs</code> / <code>Kino.Config</code></td><td>свой файл в <code>ConfigDirectory</code> (см. раздел 9)</td></tr><tr><td>maykr → <code>.ksm</code></td><td><code>Build-Mod.ps1</code> / <code>stratum-pack</code> → <code>.strmod</code></td></tr></tbody></table></div>
+<p>Главное отличие: в Stratum.API сервисы — это свойства вашего мода (<code>Log</code>, <code>UI</code>, …), а не глобальный <code>Kino</code>. Во вспомогательные классы передавайте ссылку на мод, как в <code>examples\ExampleMod</code>.</p>
+  </main>
+</div>
+<footer class="footer">
+  <span>Stratum SDK 1.0.0 · STRATUM 0.12.0 · CarX Drift Racing Online 2, Windows x64</span>
+  <span>Этот гайд лежит в SDK: docs/GUIDE-RU.md, docs/GUIDE-EN.md, docs/guide.html</span>
+</footer>
+
+<script>
+// Copy buttons; clipboard may be refused in some viewers, then the code is selected instead.
+document.querySelectorAll(".code").forEach(block => {
+  const button = block.querySelector(".copy"), code = block.querySelector("code");
+  button.addEventListener("click", () => {
+    const done = () => { button.textContent = "Скопировано"; setTimeout(() => button.textContent = "Копировать", 1600); };
+    const select = () => { const r = document.createRange(); r.selectNodeContents(code); const s = getSelection(); s.removeAllRanges(); s.addRange(r); button.textContent = "Выделено — Ctrl+C"; };
+    try { navigator.clipboard.writeText(code.textContent).then(done, select); } catch { select(); }
+  });
+});
+// Light syntax colouring for C#, PowerShell and XML samples.
+const KEYWORDS = /\b(using|namespace|public|private|static|readonly|sealed|class|override|void|bool|int|float|string|var|new|return|if|foreach|in|null|true|false|byte|get|set|param|long)\b/g;
+document.querySelectorAll("pre code").forEach(code => {
+  const lang = code.className.replace("lang-", "");
+  if (!["csharp", "powershell", "xml", "ini"].includes(lang)) return;
+  let h = code.innerHTML;
+  const slots = [];
+  const keep = (cls) => (m) => { slots.push(`<span class="${cls}">${m}</span>`); return `\u0001${slots.length - 1}\u0001`; };
+  // Strings first, so "https://…" inside a string is never read as a comment.
+  h = h.replace(lang === "powershell" ? /("[^"\n]*"|'[^'\n]*')/g : /("[^"\n]*")/g, keep("tok-s"));
+  if (lang === "csharp") h = h.replace(/\/\/[^\n]*/g, keep("tok-c"));
+  if (lang === "powershell") h = h.replace(/(^|\n)(\s*#[^\n]*)/g, (m, nl, c) => nl + keep("tok-c")(c));
+  if (lang === "xml") h = h.replace(/&lt;!--[\s\S]*?--&gt;/g, keep("tok-c"));
+  if (lang === "csharp") { h = h.replace(KEYWORDS, keep("tok-k")); h = h.replace(/\[(StratumMod)/g, (m, t) => "[" + keep("tok-t")(t)); }
+  if (lang === "powershell") h = h.replace(/(\.\\tools\\[\w.-]+|Set-ExecutionPolicy)/g, keep("tok-t"));
+  code.innerHTML = h.replace(/\u0001(\d+)\u0001/g, (m, i) => slots[+i]);
+});
+// Highlights the section in view in the contents rail.
+const links = [...document.querySelectorAll("nav.toc a")];
+const byId = new Map(links.map(a => [decodeURIComponent(a.hash.slice(1)), a]));
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { links.forEach(a => a.classList.remove("active")); byId.get(e.target.id)?.classList.add("active"); } });
+}, { rootMargin: "0px 0px -70% 0px" });
+document.querySelectorAll("main h2[id], main h3[id]").forEach(h => observer.observe(h));
+</script>

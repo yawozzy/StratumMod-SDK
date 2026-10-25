@@ -1,0 +1,412 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Stratum.API</name>
+    </assembly>
+    <members>
+        <member name="T:Stratum.Key">
+            <summary>Keyboard keys for hotkeys (values are Windows virtual-key codes).</summary>
+        </member>
+        <member name="F:Stratum.Key.None">
+            <summary>No key.</summary>
+        </member>
+        <member name="T:Stratum.HotkeyMode">
+            <summary>When a hotkey callback runs.</summary>
+        </member>
+        <member name="F:Stratum.HotkeyMode.Press">
+            <summary>Once, when the combination is pressed.</summary>
+        </member>
+        <member name="F:Stratum.HotkeyMode.Hold">
+            <summary>Every frame while the combination is held down.</summary>
+        </member>
+        <member name="F:Stratum.HotkeyMode.Release">
+            <summary>Once, when the combination is released.</summary>
+        </member>
+        <member name="T:Stratum.ModInput">
+            <summary>Hotkeys for the mod. Players see and rebind them on the mod's page in the STRATUM menu; their choice is saved.</summary>
+            <remarks>Hotkeys do not fire while the STRATUM menu is open or when the game window is not focused.</remarks>
+        </member>
+        <member name="M:Stratum.ModInput.Bind(System.String,System.String,System.Action,Stratum.HotkeyMode,Stratum.Key[])">
+            <summary>Registers a hotkey.</summary>
+            <param name="id">Stable id used to save the player's binding (letters, digits, '.', '_', '-').</param>
+            <param name="label">Name shown in the STRATUM menu.</param>
+            <param name="callback">Runs on the Unity main thread.</param>
+            <param name="mode">When <paramref name="callback"/> runs.</param>
+            <param name="keys">Default combination: up to three modifiers (Ctrl, Shift, Alt) and one key, for example <c>Key.LeftCtrl, Key.H</c>.</param>
+            <example><code>Input.Bind("hello", "Say hello", () => Log.Info("Hello"), HotkeyMode.Press, Key.LeftCtrl, Key.H);</code></example>
+        </member>
+        <member name="M:Stratum.ModInput.Bind(System.String,System.String,System.Action,Stratum.Key[])">
+            <summary>Registers a hotkey that fires once on press.</summary>
+        </member>
+        <member name="M:Stratum.ModInput.IsHeld(System.String)">
+            <summary>True while the hotkey's combination is held down.</summary>
+        </member>
+        <member name="M:Stratum.ModInput.Describe(System.String)">
+            <summary>The player's current combination for the hotkey, for example "Ctrl + H", or "" when unbound.</summary>
+        </member>
+        <member name="T:Stratum.StratumModAttribute">
+            <summary>Marks the entry class of a STRATUM mod and describes it in the STRATUM menu.</summary>
+            <example><code>[StratumMod("author.mymod", "My Mod", "1.0.0", Author = "Me")]</code></example>
+        </member>
+        <member name="M:Stratum.StratumModAttribute.#ctor(System.String,System.String,System.String)">
+            <param name="id">Unique id: lowercase letters, digits, '.', '_' or '-' (for example "author.mymod").</param>
+            <param name="name">Name shown in the STRATUM menu.</param>
+            <param name="version">Version as major.minor.patch.</param>
+        </member>
+        <member name="P:Stratum.StratumModAttribute.Id">
+            <summary>Unique mod id. It names the mod's config folder and its multiplayer channel, so keep it stable.</summary>
+        </member>
+        <member name="P:Stratum.StratumModAttribute.Name">
+            <summary>Name shown in the STRATUM menu.</summary>
+        </member>
+        <member name="P:Stratum.StratumModAttribute.Version">
+            <summary>Version as major.minor.patch.</summary>
+        </member>
+        <member name="P:Stratum.StratumModAttribute.Author">
+            <summary>Author shown in the mod details.</summary>
+        </member>
+        <member name="P:Stratum.StratumModAttribute.Description">
+            <summary>Short description shown in the mod list and details.</summary>
+        </member>
+        <member name="T:Stratum.StratumMod">
+            <summary>
+            Base class of every STRATUM mod. Derive from it, add <see cref="T:Stratum.StratumModAttribute"/> and override the callbacks you need.
+            All callbacks run on the Unity main thread, so game objects may be used from any of them.
+            </summary>
+        </member>
+        <member name="P:Stratum.StratumMod.Id">
+            <summary>Unique mod id from <see cref="T:Stratum.StratumModAttribute"/>.</summary>
+        </member>
+        <member name="P:Stratum.StratumMod.Name">
+            <summary>Mod name from <see cref="T:Stratum.StratumModAttribute"/>.</summary>
+        </member>
+        <member name="P:Stratum.StratumMod.Version">
+            <summary>Mod version from <see cref="T:Stratum.StratumModAttribute"/>.</summary>
+        </member>
+        <member name="P:Stratum.StratumMod.Log">
+            <summary>Writes to the STRATUM log (menu → Logs, filtered by this mod).</summary>
+        </member>
+        <member name="P:Stratum.StratumMod.UI">
+            <summary>Draws this mod's page in the STRATUM menu. Use it inside <see cref="M:Stratum.StratumMod.OnDrawUI"/>.</summary>
+        </member>
+        <member name="P:Stratum.StratumMod.Input">
+            <summary>Hotkeys that players can rebind in the STRATUM menu.</summary>
+        </member>
+        <member name="P:Stratum.StratumMod.Sync">
+            <summary>Messages between players in the same online room who have this mod.</summary>
+        </member>
+        <member name="P:Stratum.StratumMod.ConfigDirectory">
+            <summary>This mod's own folder for settings and data: STRATUM/Configs/&lt;id&gt;. It already exists.</summary>
+        </member>
+        <member name="M:Stratum.StratumMod.OnLoad">
+            <summary>Called once after the mod is loaded, when the game is running.</summary>
+        </member>
+        <member name="M:Stratum.StratumMod.OnUpdate(System.Single)">
+            <summary>Called every frame.</summary>
+            <param name="deltaTime">Seconds since the previous frame.</param>
+        </member>
+        <member name="M:Stratum.StratumMod.OnDrawUI">
+            <summary>
+            Called while the player has this mod's page open in the STRATUM menu (Insert → mod → «Настройки мода»).
+            Describe the page with <see cref="P:Stratum.StratumMod.UI"/> calls every time; nothing is drawn unless you call them.
+            </summary>
+        </member>
+        <member name="M:Stratum.StratumMod.OnQuit">
+            <summary>Called once when the game is closing. Save unsaved data here.</summary>
+        </member>
+        <member name="M:Stratum.StratumMod.GetIcon">
+            <summary>Return PNG bytes to show your own logo in the STRATUM menu, or null for the default monogram.</summary>
+            <remarks>A logo packed into a .strmod by stratum-pack takes priority.</remarks>
+        </member>
+        <member name="M:Stratum.StratumMod.LoadEmbeddedResource(System.String)">
+            <summary>Reads an embedded resource of the mod assembly (for example a logo added as EmbeddedResource).</summary>
+            <param name="name">Logical resource name, for example "MyMod.Resources.icon.png".</param>
+            <returns>The resource bytes, or null when it does not exist.</returns>
+        </member>
+        <member name="T:Stratum.ModLog">
+            <summary>Writes messages to the STRATUM log; they appear in the menu under Logs with this mod as the source.</summary>
+        </member>
+        <member name="M:Stratum.ModLog.Info(System.String)">
+            <summary>Writes an informational message.</summary>
+        </member>
+        <member name="M:Stratum.ModLog.Warning(System.String)">
+            <summary>Writes a warning.</summary>
+        </member>
+        <member name="M:Stratum.ModLog.Error(System.String)">
+            <summary>Writes an error.</summary>
+        </member>
+        <member name="M:Stratum.ModLog.Error(System.String,System.Exception)">
+            <summary>Writes an error with the exception's details.</summary>
+        </member>
+        <member name="T:Stratum.ModRuntime">
+            <summary>Per-mod services the loader wires up. Not part of the public API.</summary>
+        </member>
+        <member name="T:Stratum.StratumHostBridge">
+            <summary>What the loader provides to the API. Implemented by the STRATUM compatibility backend.</summary>
+        </member>
+        <member name="T:Stratum.ModFactory">
+            <summary>Helpers for creating mod instances; used by the loader.</summary>
+        </member>
+        <member name="T:Stratum.SyncPlayer">
+            <summary>A player in the current online room.</summary>
+            <param name="Id">Room-local player id; stable while the player stays in the room.</param>
+            <param name="Name">Nickname as the game shows it (may contain colour tags).</param>
+            <param name="IsLocal">True for yourself.</param>
+        </member>
+        <member name="M:Stratum.SyncPlayer.#ctor(System.Int32,System.String,System.Boolean)">
+            <summary>A player in the current online room.</summary>
+            <param name="Id">Room-local player id; stable while the player stays in the room.</param>
+            <param name="Name">Nickname as the game shows it (may contain colour tags).</param>
+            <param name="IsLocal">True for yourself.</param>
+        </member>
+        <member name="P:Stratum.SyncPlayer.Id">
+            <summary>Room-local player id; stable while the player stays in the room.</summary>
+        </member>
+        <member name="P:Stratum.SyncPlayer.Name">
+            <summary>Nickname as the game shows it (may contain colour tags).</summary>
+        </member>
+        <member name="P:Stratum.SyncPlayer.IsLocal">
+            <summary>True for yourself.</summary>
+        </member>
+        <member name="T:Stratum.SyncMessage">
+            <summary>A message received from another player.</summary>
+        </member>
+        <member name="P:Stratum.SyncMessage.Channel">
+            <summary>Channel name the sender used.</summary>
+        </member>
+        <member name="P:Stratum.SyncMessage.Sender">
+            <summary>Who sent the message.</summary>
+        </member>
+        <member name="P:Stratum.SyncMessage.Data">
+            <summary>Raw message bytes.</summary>
+        </member>
+        <member name="P:Stratum.SyncMessage.Text">
+            <summary>The bytes as UTF-8 text (for messages sent with <see cref="M:Stratum.ModSync.Send(System.String,System.String)"/>).</summary>
+        </member>
+        <member name="M:Stratum.SyncMessage.Read">
+            <summary>Reads values written with <see cref="T:Stratum.SyncWriter"/>, in the same order.</summary>
+        </member>
+        <member name="T:Stratum.ModSync">
+            <summary>
+            Messages between players in the same online room who have this mod installed and enabled.
+            </summary>
+            <remarks>
+            <para>Delivery goes through the game's multiplayer server and usually takes 0.5–5 seconds. It suits events and
+            shared state (a setting, a score, a ready flag), not data that changes every frame.</para>
+            <para>Messages queued within one send window (0.5 s) are delivered together; each window may carry up to
+            <see cref="F:Stratum.ModSync.MaxWindowBytes"/>. If a receiver misses a window (for example, it just joined), those messages are lost:
+            resend important state periodically or when <see cref="E:Stratum.ModSync.PlayerJoined"/> fires.</para>
+            <para>Only players with the same mod id receive the messages. Other players see nothing.</para>
+            </remarks>
+        </member>
+        <member name="F:Stratum.ModSync.MaxMessageBytes">
+            <summary>Largest message, in bytes.</summary>
+        </member>
+        <member name="F:Stratum.ModSync.MaxWindowBytes">
+            <summary>Largest total of messages sent in one 0.5 s window, in bytes.</summary>
+        </member>
+        <member name="P:Stratum.ModSync.IsAvailable">
+            <summary>True while you are in an online room and messages can be sent.</summary>
+        </member>
+        <member name="P:Stratum.ModSync.IsPrivateRoom">
+            <summary>True when the current room was joined with a password (a private session).</summary>
+        </member>
+        <member name="P:Stratum.ModSync.LocalPlayer">
+            <summary>You, while in a room.</summary>
+        </member>
+        <member name="P:Stratum.ModSync.Players">
+            <summary>Other players in the room who have this mod.</summary>
+        </member>
+        <member name="E:Stratum.ModSync.PlayerJoined">
+            <summary>A player with this mod appeared in the room (or you joined a room where they are).</summary>
+        </member>
+        <member name="E:Stratum.ModSync.PlayerLeft">
+            <summary>A player with this mod left the room, or you left it.</summary>
+        </member>
+        <member name="M:Stratum.ModSync.On(System.String,System.Action{Stratum.SyncMessage})">
+            <summary>Calls <paramref name="handler"/> for every message on <paramref name="channel"/>.</summary>
+            <param name="channel">Channel name, 1–32 characters.</param>
+            <param name="handler">Runs on the Unity main thread.</param>
+        </member>
+        <member name="M:Stratum.ModSync.Send(System.String,System.Byte[])">
+            <summary>Sends bytes to everyone in the room with this mod.</summary>
+            <returns>False when not in a room, or the message or window is too large.</returns>
+        </member>
+        <member name="M:Stratum.ModSync.Send(System.String,System.String)">
+            <summary>Sends text to everyone in the room with this mod.</summary>
+        </member>
+        <member name="M:Stratum.ModSync.Send(System.String,Stratum.SyncWriter)">
+            <summary>Sends the values written to <paramref name="writer"/>.</summary>
+        </member>
+        <member name="T:Stratum.SyncWriter">
+            <summary>Packs values into a compact message for <see cref="M:Stratum.ModSync.Send(System.String,Stratum.SyncWriter)"/>.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.#ctor">
+            <summary>Creates an empty message.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.Write(System.Boolean)">
+            <summary>Appends a value.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.Write(System.Byte)">
+            <summary>Appends a value.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.Write(System.Int32)">
+            <summary>Appends a value.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.Write(System.Int64)">
+            <summary>Appends a value.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.Write(System.Single)">
+            <summary>Appends a value.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.Write(System.Double)">
+            <summary>Appends a value.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.Write(System.String)">
+            <summary>Appends a UTF-8 string.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.Write(System.Single,System.Single,System.Single)">
+            <summary>Appends three floats (for example a position).</summary>
+        </member>
+        <member name="P:Stratum.SyncWriter.Length">
+            <summary>Current size in bytes.</summary>
+        </member>
+        <member name="M:Stratum.SyncWriter.ToArray">
+            <summary>The packed bytes.</summary>
+        </member>
+        <member name="T:Stratum.SyncReader">
+            <summary>Reads values from a received message in the order they were written.</summary>
+        </member>
+        <member name="P:Stratum.SyncReader.End">
+            <summary>True when every value was read.</summary>
+        </member>
+        <member name="M:Stratum.SyncReader.ReadBool">
+            <summary>Reads the next value.</summary>
+        </member>
+        <member name="M:Stratum.SyncReader.ReadByte">
+            <summary>Reads the next value.</summary>
+        </member>
+        <member name="M:Stratum.SyncReader.ReadInt">
+            <summary>Reads the next value.</summary>
+        </member>
+        <member name="M:Stratum.SyncReader.ReadLong">
+            <summary>Reads the next value.</summary>
+        </member>
+        <member name="M:Stratum.SyncReader.ReadFloat">
+            <summary>Reads the next value.</summary>
+        </member>
+        <member name="M:Stratum.SyncReader.ReadDouble">
+            <summary>Reads the next value.</summary>
+        </member>
+        <member name="M:Stratum.SyncReader.ReadString">
+            <summary>Reads the next value.</summary>
+        </member>
+        <member name="M:Stratum.SyncReader.ReadVector">
+            <summary>Reads three floats.</summary>
+        </member>
+        <member name="T:Stratum.ModUI">
+            <summary>
+            Immediate-mode UI for the mod's page in the STRATUM menu, in the menu's own style.
+            Call these methods from <see cref="M:Stratum.StratumMod.OnDrawUI"/> (and from pages opened with <see cref="M:Stratum.ModUI.PageButton(System.String,System.Action,System.String,System.String)"/>) every time;
+            interactive widgets return true in the frame after the player used them.
+            </summary>
+            <remarks>
+            Labels double as widget ids. Two widgets with the same label on one page are told apart by order;
+            add a hidden suffix with "##" to keep an id stable when the order changes: <c>UI.Button("Delete##slot2")</c>.
+            </remarks>
+        </member>
+        <member name="P:Stratum.ModUI.IsOpen">
+            <summary>True while the player has this mod's page open; UI calls outside the page do nothing.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Label(System.String)">
+            <summary>Plain text that wraps to the page width.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Header(System.String)">
+            <summary>Bold section heading.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Hint(System.String)">
+            <summary>Muted secondary text, for explanations under a setting.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Separator">
+            <summary>Thin horizontal line.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Space(System.Single)">
+            <summary>Empty vertical gap.</summary>
+            <param name="height">Height in menu pixels at 100% scale.</param>
+        </member>
+        <member name="M:Stratum.ModUI.Button(System.String,System.String,System.Boolean)">
+            <summary>A button.</summary>
+            <param name="label">Button text.</param>
+            <param name="tooltip">Shown when the cursor rests on the button.</param>
+            <param name="primary">Accent colour for the main action.</param>
+            <returns>True once after the player clicked it.</returns>
+        </member>
+        <member name="M:Stratum.ModUI.Toggle(System.String,System.Boolean@,System.String)">
+            <summary>An on/off switch with a label.</summary>
+            <param name="label">Text next to the switch.</param>
+            <param name="value">Current value; updated when the player flips the switch.</param>
+            <param name="tooltip">Shown when the cursor rests on the row.</param>
+            <returns>True when <paramref name="value"/> changed.</returns>
+        </member>
+        <member name="M:Stratum.ModUI.Slider(System.String,System.Single@,System.Single,System.Single,System.Single,System.String)">
+            <summary>A slider for a decimal value.</summary>
+            <param name="label">Text above the slider.</param>
+            <param name="value">Current value; updated while the player drags.</param>
+            <param name="min">Lowest value.</param>
+            <param name="max">Highest value.</param>
+            <param name="step">Snapping step, or 0 for none.</param>
+            <param name="tooltip">Shown when the cursor rests on the slider.</param>
+            <returns>True when <paramref name="value"/> changed.</returns>
+        </member>
+        <member name="M:Stratum.ModUI.Slider(System.String,System.Int32@,System.Int32,System.Int32,System.String)">
+            <summary>A slider for a whole number.</summary>
+            <returns>True when <paramref name="value"/> changed.</returns>
+        </member>
+        <member name="M:Stratum.ModUI.Input(System.String,System.String@,System.Int32,System.String)">
+            <summary>A one-line text field.</summary>
+            <param name="label">Text above the field.</param>
+            <param name="value">Current text; updated as the player types.</param>
+            <param name="maxLength">Longest allowed text.</param>
+            <param name="hint">Grey placeholder shown while the field is empty.</param>
+            <returns>True when <paramref name="value"/> changed.</returns>
+        </member>
+        <member name="M:Stratum.ModUI.Dropdown(System.String,System.Int32@,System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>A drop-down list.</summary>
+            <param name="label">Text next to the list.</param>
+            <param name="index">Selected option index; updated when the player picks another one.</param>
+            <param name="options">Options to choose from.</param>
+            <returns>True when <paramref name="index"/> changed.</returns>
+        </member>
+        <member name="M:Stratum.ModUI.Progress(System.String,System.Single)">
+            <summary>A progress bar.</summary>
+            <param name="label">Text above the bar.</param>
+            <param name="fraction">Progress from 0 to 1.</param>
+        </member>
+        <member name="M:Stratum.ModUI.Link(System.String,System.String)">
+            <summary>A link that opens a web page in the browser (http or https only).</summary>
+        </member>
+        <member name="M:Stratum.ModUI.PageButton(System.String,System.Action,System.String,System.String)">
+            <summary>A button that opens a nested page. The menu shows the page title and a Back button.</summary>
+            <param name="label">Button text.</param>
+            <param name="draw">Draws the nested page; called every frame while it is open.</param>
+            <param name="title">Page title; defaults to <paramref name="label"/>.</param>
+            <param name="tooltip">Shown when the cursor rests on the button.</param>
+            <returns>True once when the page was opened.</returns>
+        </member>
+        <member name="M:Stratum.ModUI.Back">
+            <summary>Returns to the previous page, if a nested page is open.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Row">
+            <summary>Places the widgets inside the using block side by side: <c>using (UI.Row()) { ... }</c>.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Group(System.String)">
+            <summary>Frames the widgets inside the using block as a card with an optional title.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Frame(System.Action)">
+            <summary>Builds one frame of the page: applies the player's input, runs the draw code, sends the widgets to the menu.</summary>
+        </member>
+        <member name="M:Stratum.ModUI.Reset">
+            <summary>Drops nested pages when the player leaves the mod's page.</summary>
+        </member>
+    </members>
+</doc>
