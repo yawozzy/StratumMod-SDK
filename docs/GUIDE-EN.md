@@ -3,7 +3,7 @@
 STRATUM is an in-game mod loader for **CarX Drift Racing Online 2** (Windows x64); press **Insert** in the game to open its menu.
 Stratum SDK is the kit for C# mods: the **Stratum.API** library, a packer, a template and a full example.
 
-> Versions: STRATUM **0.12.0**, Stratum.API **1.0.0**. Русская версия: [GUIDE-RU.md](GUIDE-RU.md).
+> Versions: STRATUM **0.13.0**, Stratum.API **1.0.0**. Русская версия: [GUIDE-RU.md](GUIDE-RU.md).
 
 - [Part 1. For players](#part-1-for-players)
 - [Part 2. For modders](#part-2-for-modders)
@@ -17,7 +17,9 @@ Stratum SDK is the kit for C# mods: the **Stratum.API** library, a packer, a tem
 1. Close the game.
 2. Copy **winhttp.dll** into the game folder, next to `CarX Drift Racing Online 2.exe` (Steam → right-click the game → **Manage** → **Browse local files**).
 3. For C# mods, install the free **[Microsoft .NET 8 Runtime (x64)](https://dotnet.microsoft.com/download/dotnet/8.0)** once. Without it only native mods run; C# mods show a hint in the menu.
-4. Start the game through Steam. A **STRATUM** folder appears next to the game.
+4. Start the game through Steam. A **STRATUM** folder appears next to the game, and on the first run the menu opens by itself so you can pick a language (change it later in **Settings**).
+
+![Language on first run](images/10-language.png)
 
 > Coming from BepInEx: remove `doorstop_config.ini`, the `BepInEx` and `dotnet` folders and BepInEx's `winhttp.dll`. STRATUM replaces them and runs BepInEx 6 IL2CPP mods itself.
 
@@ -27,11 +29,11 @@ Stratum SDK is the kit for C# mods: the **Stratum.API** library, a packer, a tem
 
 ![Mod list](images/01-sdk-list.png)
 
-**My mods** lists installed mods (the switch turns a mod on or off), **Logs** shows loader and mod events, **Settings** has scale, language, animations and auto-enable.
+The rail on the left holds the sections: **My mods** shows installed mods as cards (tabs filter all / running / disabled / with errors; the switch turns a mod on or off; clicking a card opens its page), **Catalog** is reserved for the mod catalog, **Logs** shows loader and mod events including BepInEx mods, and **Settings** (bottom) has scale, animations, language, auto-enable, file logs and the developer console.
 
 ### Installing mods
 
-Use **«Установить мод» (Install mod)** → a `.strmod`/`.dll` file, or a folder (a mod folder or a whole old `BepInEx` folder: its `plugins` become mods, its `config` goes to `STRATUM\Configs\Legacy`). Or drop files into `STRATUM\Mods` while the game is closed.
+Use **Install mod** → **Mod file** (a `.strmod`/`.dll`), **Mod folder**, or **Move from BepInEx** (a whole old `BepInEx` folder: its `plugins` become mods, its `config` goes to `STRATUM\Configs\Legacy`). Or drop files into `STRATUM\Mods` while the game is closed.
 
 ![Install mod](images/02-import.png)
 
@@ -45,13 +47,17 @@ BepInEx 5 / Mono mods are not supported. Enabling or disabling a C# mod applies 
 
 ### Mod settings, hotkeys, logs
 
-Select a mod → **«Настройки мода» (Mod settings)** shows the mod's page and, below it, its hotkeys: click a combination, then press new keys (**Esc** cancels, **Backspace** clears, the arrow button restores the default).
+Click a mod card to open its page. Tabs: **Mod page** (what the mod draws), **Hotkeys** (click a combination, then press new keys; **Esc** cancels, **Backspace** clears, the arrow button restores the default), **Files and configs** (type, version, file, load errors, folders) and **Mod logs**.
 
 ![Hotkeys](images/06-sdk-hotkeys.png)
 
 ![Logs](images/08-logs.png)
 
 *Example entries from Example Mod.*
+
+**Developer console.** **Settings → Developer console** opens a separate window with every log line in real time: STRATUM, Stratum SDK mods and BepInEx mods, warnings in yellow and errors in red, starting with the session so far. Turn it off with the same switch (the window's close button is removed because closing a console window would also close the game).
+
+![Settings](images/09-settings.png)
 
 ```text
 <game folder>\
@@ -114,7 +120,7 @@ Mod ids use lowercase letters, digits, `.`, `_`, `-` (for example `nick.mod`). K
 |---|---|
 | `OnLoad()` | once, when the game is running |
 | `OnUpdate(float deltaTime)` | every frame |
-| `OnDrawUI()` | while the player has the mod's page open (~30 times a second) |
+| `OnDrawUI()` | while the player has the mod's "Mod page" tab open (~30 times a second) |
 | `OnQuit()` | when the game closes |
 | `GetIcon()` | once at load: PNG bytes or `null` |
 
@@ -230,7 +236,7 @@ Use `ConfigDirectory`; see `examples\ExampleMod\Settings.cs` for a JSON example.
 
 ### 12. Troubleshooting
 
-Logs: menu → **Logs** (filter by your mod), or `STRATUM\Logs\mods.log` (mod messages), `compatibility.log` (C# layer details), `loader.log`.
+The quickest view is the **developer console** (Settings → Developer console): your `Log.*` calls and exceptions show up there at once. Also: menu → **Logs** (filter by your mod), or `STRATUM\Logs\mods.log` (mod messages), `compatibility.log` (C# layer details), `loader.log`.
 
 | Problem | Fix |
 |---|---|

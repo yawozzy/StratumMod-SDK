@@ -6,8 +6,8 @@
 <style>
 /* Layout: the STRATUM menu's own world — graphite panels, one orange accent; sticky contents rail beside a 70ch reading column. */
 :root {
-  --bg: #0e1215; --panel: #151b1f; --panel-2: #1b2227; --line: #263038; --fg: #e9ecef; --muted: #9aa5ae;
-  --accent: #ff9c51; --accent-ink: #1c1108; --accent-soft: rgba(255,156,81,.12); --code: #0a0d10; --ok: #4bdb4b;
+  --bg: #141517; --panel: #1c1d20; --panel-2: #24262a; --line: #2a2c31; --fg: #e9ecef; --muted: #9aa5ae;
+  --accent: #ffd23f; --accent-ink: #141517; --accent-soft: rgba(255,210,63,.12); --code: #0a0d10; --ok: #4bdb4b;
   --display: "Unbounded", "Segoe UI", system-ui, sans-serif;
   --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", Consolas, "Cascadia Mono", monospace;
@@ -15,10 +15,10 @@
 }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
   --bg: #f3f5f6; --panel: #ffffff; --panel-2: #eef1f3; --line: #d8dee2; --fg: #141a1e; --muted: #56616a;
-  --accent: #c4601a; --accent-ink: #ffffff; --accent-soft: rgba(196,96,26,.10); --code: #f6f8f9; --ok: #1f8f3a; color-scheme: light } }
+  --accent: #8a5f00; --accent-ink: #ffffff; --accent-soft: rgba(138,95,0,.10); --code: #f6f8f9; --ok: #1f8f3a; color-scheme: light } }
 :root[data-theme="light"] {
   --bg: #f3f5f6; --panel: #ffffff; --panel-2: #eef1f3; --line: #d8dee2; --fg: #141a1e; --muted: #56616a;
-  --accent: #c4601a; --accent-ink: #ffffff; --accent-soft: rgba(196,96,26,.10); --code: #f6f8f9; --ok: #1f8f3a; color-scheme: light }
+  --accent: #8a5f00; --accent-ink: #ffffff; --accent-soft: rgba(138,95,0,.10); --code: #f6f8f9; --ok: #1f8f3a; color-scheme: light }
 
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font: 400 16px/1.65 var(--body); margin: 0;
@@ -100,13 +100,13 @@ figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
 <header class="hero">
   <div>
     <div class="brand" aria-label="STRATUM">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16.02 12 5.48 3.13a1 1 0 0 1 0 1.74L13 21.74a2 2 0 0 1-2 0l-8.5-4.87a1 1 0 0 1 0-1.74L7.98 12"/><path d="M13 13.74a2 2 0 0 1-2 0L2.5 8.87a1 1 0 0 1 0-1.74L11 2.26a2 2 0 0 1 2 0l8.5 4.87a1 1 0 0 1 0 1.74Z"/></svg>
+      <svg viewBox="0 0 48 48" fill="currentColor" aria-hidden="true"><path d="M8 34h22l-4 6H4z"/><path d="M14 22h22l-4 6H10z" opacity=".75"/><path d="M20 10h22l-4 6H16z" opacity=".5"/></svg>
       STRATUM
     </div>
     <h1>Моды для CarX Drift Racing Online 2 на C#</h1>
     <p>Как установить загрузчик STRATUM и как написать свой мод: страница в меню игры, горячие клавиши, обмен сообщениями между игроками и прямой доступ к Unity и классам CarX.</p>
     <div class="chips">
-      <span class="chip">STRATUM <b>0.12.0</b></span>
+      <span class="chip">STRATUM <b>0.13.0</b></span>
       <span class="chip">Stratum.API <b>1.0.0</b></span>
       <span class="chip">.NET <b>8</b></span>
       <span class="chip">Insert — <b>меню</b></span>
@@ -127,6 +127,7 @@ figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
 <a class="nav-item" href="#установка-модов">Установка модов</a>
 <a class="nav-item" href="#настройки-мода-и-горячие-клавиши">Настройки мода и горячие клавиши</a>
 <a class="nav-item" href="#логи">Логи</a>
+<a class="nav-item" href="#консоль-разработчика">Консоль разработчика</a>
 <a class="nav-item" href="#где-лежат-файлы">Где лежат файлы</a>
 <a class="nav-part" href="#часть-2-для-мододелов">Часть 2. Для мододелов</a>
 <a class="nav-item" href="#1-что-нужно-установить">1. Что нужно установить</a>
@@ -152,6 +153,7 @@ figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
 <a class="nav-item" href="#установка-модов">Установка модов</a>
 <a class="nav-item" href="#настройки-мода-и-горячие-клавиши">Настройки мода и горячие клавиши</a>
 <a class="nav-item" href="#логи">Логи</a>
+<a class="nav-item" href="#консоль-разработчика">Консоль разработчика</a>
 <a class="nav-item" href="#где-лежат-файлы">Где лежат файлы</a>
 <a class="nav-part" href="#часть-2-для-мододелов">Часть 2. Для мододелов</a>
 <a class="nav-item" href="#1-что-нужно-установить">1. Что нужно установить</a>
@@ -170,19 +172,21 @@ figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
 <a class="nav-item" href="#14-для-тех-кто-писал-под-ksl">14. Для тех, кто писал под KSL</a>
     </nav></details>
 <p>STRATUM — загрузчик модов для <strong>CarX Drift Racing Online 2</strong> (Windows x64). Меню открывается прямо в игре клавишей <strong>Insert</strong>. Stratum SDK — набор для создания модов на C#: библиотека <strong>Stratum.API</strong>, упаковщик, шаблон и большой пример.</p>
-<aside class="note"><p>Версии: STRATUM <strong>0.12.0</strong>, Stratum.API <strong>1.0.0</strong>.</p></aside>
+<aside class="note"><p>Версии: STRATUM <strong>0.13.0</strong>, Stratum.API <strong>1.0.0</strong>.</p></aside>
 <h2 id="часть-1-для-игроков">Часть 1. Для игроков</h2>
 <h3 id="установка-stratum">Установка STRATUM</h3>
-<ol><li>Закройте игру.</li><li>Скопируйте <strong>winhttp.dll</strong> из архива STRATUM в папку игры — туда, где лежит <code>CarX Drift Racing Online 2.exe</code>. Обычно это <code>C:\Program Files (x86)\Steam\steamapps\common\CarX Drift Racing Online 2</code>. Быстрый путь: Steam → ПКМ по игре → <strong>Управление</strong> → <strong>Просмотреть локальные файлы</strong>.</li><li>Для модов на C# один раз установите бесплатный <strong><a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">Microsoft .NET 8 Runtime (x64)</a></strong> — раздел «.NET Runtime», Windows x64. Без него работают только нативные моды, а у C#-модов в меню будет подсказка.</li><li>Запустите игру через Steam. При первом запуске рядом с игрой появится папка <strong>STRATUM</strong>.</li></ol>
+<ol><li>Закройте игру.</li><li>Скопируйте <strong>winhttp.dll</strong> из архива STRATUM в папку игры — туда, где лежит <code>CarX Drift Racing Online 2.exe</code>. Обычно это <code>C:\Program Files (x86)\Steam\steamapps\common\CarX Drift Racing Online 2</code>. Быстрый путь: Steam → ПКМ по игре → <strong>Управление</strong> → <strong>Просмотреть локальные файлы</strong>.</li><li>Для модов на C# один раз установите бесплатный <strong><a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">Microsoft .NET 8 Runtime (x64)</a></strong> — раздел «.NET Runtime», Windows x64. Без него работают только нативные моды, а у C#-модов в меню будет подсказка.</li><li>Запустите игру через Steam. При первом запуске рядом с игрой появится папка <strong>STRATUM</strong>, а меню откроется само и предложит выбрать язык. Потом его можно сменить в <strong>Настройках</strong>.</li></ol>
+<figure><img src="images/10-language.png" alt="Выбор языка при первом запуске" loading="lazy"><figcaption>Выбор языка при первом запуске</figcaption></figure>
 <aside class="note"><p>Если раньше стоял BepInEx, уберите из папки игры его файлы: <code>doorstop_config.ini</code>, папки <code>BepInEx</code> и <code>dotnet</code> и старый <code>winhttp.dll</code> BepInEx. STRATUM заменяет их полностью, а моды BepInEx 6 IL2CPP запускает сам.</p></aside>
 <h3 id="меню-stratum">Меню STRATUM</h3>
 <p>Нажмите <strong>Insert</strong> в игре. Ещё раз <strong>Insert</strong> — меню закроется.</p>
 <figure><img src="images/01-sdk-list.png" alt="Список модов" loading="lazy"><figcaption>Список модов</figcaption></figure>
-<ul><li><strong>Мои моды</strong> — список установленных модов. Справа — подробности о выбранном моде.</li><li>Переключатель справа в строке мода включает и выключает его.</li><li><strong>Логи</strong> — события загрузчика и модов.</li><li><strong>Настройки</strong> — масштаб интерфейса, язык, анимации, автозапуск новых модов.</li></ul>
+<p>Слева — панель разделов (подсказка появляется при наведении):</p>
+<ul><li><strong>Мои моды</strong> — установленные моды карточками. Вкладки сверху оставляют все моды, работающие, выключенные или с ошибками. Переключатель на карточке включает и выключает мод, нажатие на карточку открывает его страницу.</li><li><strong>Каталог</strong> — здесь появится каталог модов.</li><li><strong>Логи</strong> — события загрузчика и всех модов, включая моды BepInEx.</li><li><strong>Настройки</strong> (внизу) — масштаб, анимации, язык, автовключение новых модов, логи в файл и консоль разработчика.</li></ul>
 <h3 id="установка-модов">Установка модов</h3>
 <p>Есть два способа.</p>
 <p><strong>Через меню.</strong> Нажмите <strong>«Установить мод»</strong> и выберите:</p>
-<ul><li><strong>«Файл .strmod / .dll»</strong> — один мод;</li><li><strong>«Папка с модами»</strong> — папку мода или целую папку <code>BepInEx</code> от старой установки: её <code>plugins</code> станут модами, а <code>config</code> перенесётся в <code>STRATUM\Configs\Legacy</code>.</li></ul>
+<ul><li><strong>«Файл мода»</strong> — один <code>.strmod</code> или <code>.dll</code>;</li><li><strong>«Папка мода»</strong> — мод вместе с его файлами;</li><li><strong>«Перенести из BepInEx»</strong> — целая папка <code>BepInEx</code> от старой установки: её <code>plugins</code> станут модами, а <code>config</code> перенесётся в <code>STRATUM\Configs\Legacy</code>.</li></ul>
 <figure><img src="images/02-import.png" alt="Установка мода" loading="lazy"><figcaption>Установка мода</figcaption></figure>
 <p><strong>Вручную.</strong> Положите файл <code>.strmod</code> или <code>.dll</code> (или папку мода) в <code>STRATUM\Mods</code> при закрытой игре.</p>
 <p>Какие моды поддерживаются:</p>
@@ -190,12 +194,16 @@ figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
 <p>Моды для BepInEx 5 / Mono не поддерживаются: в CarX DRO2 нет Mono.</p>
 <aside class="note"><p>Включение и выключение C#-мода применяется <strong>после перезапуска игры</strong>. Уже загруженный C#-код выгрузить нельзя — меню об этом напомнит.</p></aside>
 <h3 id="настройки-мода-и-горячие-клавиши">Настройки мода и горячие клавиши</h3>
-<p>Выберите мод и нажмите <strong>«Настройки мода»</strong>. Здесь мод показывает свою страницу. Внизу — его горячие клавиши: нажмите на комбинацию и затем новые клавиши. <strong>Esc</strong> — отмена, <strong>Backspace</strong> — убрать клавишу, кнопка со стрелкой — вернуть по умолчанию.</p>
+<p>Нажмите на карточку мода. Откроется его страница с вкладками:</p>
+<ul><li><strong>Страница мода</strong> — то, что показывает сам мод (настройки, кнопки, вложенные разделы).</li><li><strong>Горячие клавиши</strong> — клавиши мода. Нажмите на комбинацию, затем новые клавиши: <strong>Esc</strong> — отмена, <strong>Backspace</strong> — убрать клавишу, кнопка со стрелкой — вернуть по умолчанию.</li><li><strong>Файлы и конфиги</strong> — тип, версия, файл, ошибки загрузки и кнопки для папок мода.</li><li><strong>Логи мода</strong> — раздел «Логи» с записями только этого мода.</li></ul>
 <figure><img src="images/06-sdk-hotkeys.png" alt="Горячие клавиши" loading="lazy"><figcaption>Горячие клавиши</figcaption></figure>
 <p>Горячие клавиши не срабатывают, пока открыто меню STRATUM или окно игры не активно.</p>
 <h3 id="логи">Логи</h3>
 <p>Раздел <strong>Логи</strong> показывает, что происходит. Фильтр «Все источники» выбирает конкретный мод, кнопки справа оставляют только предупреждения или ошибки. «Сохранить логи» копирует их в файл — пригодится, чтобы отправить автору мода.</p>
 <figure><img src="images/08-logs.png" alt="Логи" loading="lazy"><figcaption>На снимке — пример записей Example Mod.</figcaption></figure>
+<h3 id="консоль-разработчика">Консоль разработчика</h3>
+<p><strong>Настройки → Консоль разработчика</strong> открывает отдельное окно Windows со всеми записями в реальном времени: STRATUM, моды Stratum SDK и моды BepInEx. Предупреждения — жёлтым, ошибки — красным; при открытии показывается и всё, что было с начала сеанса. Закрывается консоль тем же переключателем (крестик окна убран: в Windows закрытие консоли закрывает и игру).</p>
+<figure><img src="images/09-settings.png" alt="Настройки" loading="lazy"><figcaption>Настройки</figcaption></figure>
 <h3 id="где-лежат-файлы">Где лежат файлы</h3>
 <div class="code"><div class="code-bar"><span></span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-text">&lt;папка игры&gt;\
 ├── winhttp.dll              ← STRATUM
@@ -209,7 +217,7 @@ figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
 <h2 id="часть-2-для-мододелов">Часть 2. Для мододелов</h2>
 <p>Stratum.API устроен похоже на KSL SDK: вы пишете обычную C#-библиотеку, наследуете класс мода и получаете готовые сервисы — <strong>лог, страницу в меню, горячие клавиши и обмен сообщениями между игроками</strong>. К самой игре (Unity и классам CarX) есть прямой доступ, как в модах BepInEx IL2CPP.</p>
 <h3 id="1-что-нужно-установить">1. Что нужно установить</h3>
-<ul><li><strong><a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">.NET 8 SDK</a></strong> (или новее) — для сборки.</li><li>Редактор: <strong>Visual Studio 2022</strong>, <strong>JetBrains Rider</strong> или <strong>VS Code</strong> с расширением C# Dev Kit.</li><li>Установленная игра со <strong>STRATUM 0.12+</strong> — из неё берутся ссылки на классы игры.</li></ul>
+<ul><li><strong><a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">.NET 8 SDK</a></strong> (или новее) — для сборки.</li><li>Редактор: <strong>Visual Studio 2022</strong>, <strong>JetBrains Rider</strong> или <strong>VS Code</strong> с расширением C# Dev Kit.</li><li>Установленная игра со <strong>STRATUM 0.12+</strong> (лучше 0.13) — из неё берутся ссылки на классы игры.</li></ul>
 <h3 id="2-что-внутри-sdk">2. Что внутри SDK</h3>
 <div class="code"><div class="code-bar"><span></span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-text">STRATUM-SDK-1.0.0\
 ├── API\
@@ -250,7 +258,7 @@ description=Таймер дрифта</code></pre></div>
 <aside class="note"><p>Можно ставить и просто <code>.dll</code> из <code>bin\Release\net8.0</code> — для быстрой проверки. Для публикации используйте <code>.strmod</code>: в нём есть название, автор, описание и логотип, а файл защищён контрольной суммой.</p></aside>
 <h3 id="4-как-устроен-мод">4. Как устроен мод</h3>
 <p>Мод — это класс, унаследованный от <code>StratumMod</code> и помеченный <code>[StratumMod]</code>. STRATUM создаёт один его экземпляр и вызывает методы:</p>
-<div class="table"><table><thead><tr><th>Метод</th><th>Когда вызывается</th></tr></thead><tbody><tr><td><code>OnLoad()</code></td><td>один раз, когда игра запущена</td></tr><tr><td><code>OnUpdate(float deltaTime)</code></td><td>каждый кадр</td></tr><tr><td><code>OnDrawUI()</code></td><td>пока у игрока открыта страница мода в меню (около 30 раз в секунду)</td></tr><tr><td><code>OnQuit()</code></td><td>при закрытии игры — сохраните несохранённое</td></tr><tr><td><code>GetIcon()</code></td><td>один раз при загрузке — PNG-логотип или <code>null</code></td></tr></tbody></table></div>
+<div class="table"><table><thead><tr><th>Метод</th><th>Когда вызывается</th></tr></thead><tbody><tr><td><code>OnLoad()</code></td><td>один раз, когда игра запущена</td></tr><tr><td><code>OnUpdate(float deltaTime)</code></td><td>каждый кадр</td></tr><tr><td><code>OnDrawUI()</code></td><td>пока у игрока открыта вкладка «Страница мода» (около 30 раз в секунду)</td></tr><tr><td><code>OnQuit()</code></td><td>при закрытии игры — сохраните несохранённое</td></tr><tr><td><code>GetIcon()</code></td><td>один раз при загрузке — PNG-логотип или <code>null</code></td></tr></tbody></table></div>
 <p><strong>Все методы выполняются в главном потоке Unity.</strong> Поэтому из любого из них можно спокойно работать с объектами игры — в том числе из кода страницы в меню.</p>
 <p>Что доступно внутри класса мода:</p>
 <div class="table"><table><thead><tr><th>Свойство</th><th>Что это</th></tr></thead><tbody><tr><td><code>Log</code></td><td>запись в лог STRATUM (<code>Info</code>, <code>Warning</code>, <code>Error</code>)</td></tr><tr><td><code>UI</code></td><td>элементы страницы мода</td></tr><tr><td><code>Input</code></td><td>горячие клавиши</td></tr><tr><td><code>Sync</code></td><td>сообщения между игроками</td></tr><tr><td><code>ConfigDirectory</code></td><td>личная папка мода <code>STRATUM\Configs\&lt;id&gt;</code></td></tr><tr><td><code>Id</code>, <code>Name</code>, <code>Version</code></td><td>данные из атрибута</td></tr></tbody></table></div>
@@ -292,7 +300,7 @@ void DrawAdvanced()
 <h4 id="важно-знать">Важно знать</h4>
 <ul><li><strong>Подписи — это id элементов.</strong> Если на странице две кнопки «Удалить», они различаются по порядку. Чтобы id не зависел от порядка, добавьте скрытый суффикс: <code>UI.Button(&quot;Удалить##slot2&quot;)</code> — после <code>##</code> текст не показывается.</li><li><strong>Значения храните в полях класса.</strong> Метод <code>Toggle(ref value)</code> меняет вашу переменную, поэтому её нужно держать между кадрами.</li><li><strong>Задержка — один кадр.</strong> Нажатие приходит моду в следующем вызове <code>OnDrawUI</code>. Это незаметно для игрока.</li><li><strong>Код страницы работает только пока она открыта.</strong> Логику, которая должна работать всегда, держите в <code>OnUpdate</code>.</li></ul>
 <h3 id="6-горячие-клавиши">6. Горячие клавиши</h3>
-<p>Зарегистрируйте клавиши в <code>OnLoad</code>. Игрок увидит их на странице мода и сможет переназначить — выбор сохраняется сам (<code>STRATUM\Configs\&lt;id&gt;\hotkeys.cfg</code>).</p>
+<p>Зарегистрируйте клавиши в <code>OnLoad</code>. Игрок увидит их на вкладке «Горячие клавиши» своего мода и сможет переназначить — выбор сохраняется сам (<code>STRATUM\Configs\&lt;id&gt;\hotkeys.cfg</code>).</p>
 <div class="code"><div class="code-bar"><span>C#</span><button type="button" class="copy">Копировать</button></div><pre><code class="lang-csharp">public override void OnLoad()
 {
     // Нажатие: один раз. По умолчанию Ctrl + H.
@@ -393,7 +401,7 @@ public override void OnDrawUI()
 .\tools\stratum-pack.exe inspect DriftTimer-1.0.0.strmod</code></pre></div>
 <p><code>inspect</code> покажет данные пакета и <code>abi=2 (C# Stratum.API)</code>. Упаковщик сам определяет тип DLL, так что нативные моды (C++ / Native AOT) он пакует тоже.</p>
 <h3 id="12-отладка-и-частые-ошибки">12. Отладка и частые ошибки</h3>
-<p>Смотрите <strong>Логи</strong> в меню (фильтр по вашему моду) или файлы в <code>STRATUM\Logs</code>:</p>
+<p>Удобнее всего — <strong>консоль разработчика</strong> (Настройки → Консоль разработчика): <code>Log.Info</code>, <code>Log.Warning</code>, <code>Log.Error</code> и исключения вашего мода появляются в ней сразу. Ещё есть <strong>Логи</strong> в меню (фильтр по вашему моду) и файлы в <code>STRATUM\Logs</code>:</p>
 <ul><li><code>mods.log</code> — сообщения модов (<code>Log.Info</code> и т. п.) и статусы загрузки;</li><li><code>compatibility.log</code> — подробности слоя C# (исключения, BepInEx-моды);</li><li><code>loader.log</code> — запуск STRATUM.</li></ul>
 <div class="table"><table><thead><tr><th>Проблема</th><th>Причина и решение</th></tr></thead><tbody><tr><td><code>error CS0656 ... NullableAttribute</code></td><td>нет <code>NullableAttributes.cs</code> в проекте — скопируйте его из шаблона</td></tr><tr><td>Не находятся <code>UnityEngine</code>, <code>Camera</code> и т. п.</td><td>не выполнен <code>Get-GameReferences.ps1</code> или не добавлена ссылка в <code>.csproj</code></td></tr><tr><td>В меню «Для C#-модов установите .NET 8»</td><td>у игрока нет .NET 8 Runtime x64</td></tr><tr><td>«Недопустимый id мода»</td><td>id содержит заглавные буквы, пробелы или кириллицу</td></tr><tr><td>«В сборке нет класса, унаследованного от StratumMod»</td><td>класс мода абстрактный, не наследует <code>StratumMod</code> или его нет</td></tr><tr><td>«Класс … без атрибута [StratumMod]»</td><td>добавьте атрибут</td></tr><tr><td>«Мод с id … уже загружен»</td><td>установлены две копии мода</td></tr><tr><td>Мод остановлен с ошибкой <code>OnUpdate</code></td><td>исключение в <code>OnUpdate</code>: смотрите стек в логе</td></tr><tr><td>Изменения не применяются</td><td>C#-мод обновляется только после перезапуска игры</td></tr><tr><td>Хоткей не срабатывает</td><td>открыто меню STRATUM, игра не в фокусе или зажат лишний модификатор (сравнение точное)</td></tr><tr><td><code>Sync.Send</code> возвращает <code>false</code></td><td>вы не в онлайн-комнате, сообщение больше 512 байт или пачка за 0,5 с уже заполнена</td></tr></tbody></table></div>
 <h3 id="13-справочник-api">13. Справочник API</h3>
@@ -412,7 +420,7 @@ public override void OnDrawUI()
   </main>
 </div>
 <footer class="footer">
-  <span>Stratum SDK 1.0.0 · STRATUM 0.12.0 · CarX Drift Racing Online 2, Windows x64</span>
+  <span>Stratum SDK 1.0.0 · STRATUM 0.13.0 · CarX Drift Racing Online 2, Windows x64</span>
   <span>Этот гайд лежит в SDK: docs/GUIDE-RU.md, docs/GUIDE-EN.md, docs/guide.html</span>
 </footer>
 
